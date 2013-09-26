@@ -40,7 +40,6 @@ Octopus.prototype.build = function()
 
 		this.tentPosers[i].rotation.y = i*radPerTent;
 
-
 		this.add(this.tentPosers[i]);
 	}
 }
@@ -65,8 +64,10 @@ OctopusHead.prototype = Object.create(THREE.Object3D.prototype);
 
 OctopusHead.prototype.build = function()
 {
-	var sphere = new THREE.SphereGeometry(this.genome.headRadius, this.genome.sphereDetail, 
-		this.genome.sphereDetail);
+	var sphere = new THREE.SphereGeometry(
+		this.genome.headRadius,				// radius
+		this.genome.sphereDetail, 			// width segments
+		this.genome.sphereDetail);			// height segments
 	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0xaaaaaa } );
 	// var mat = new THREE.MeshNormalMaterial();
 
@@ -84,21 +85,31 @@ OctopusTentacle = function(index, genome)
 	this.genome = genome;
 	this.joints = [];
 
-	this.rotationCounter = 0;
+	// set initial rotation counter
+	this.rotationCounter = 3;
 }
 OctopusTentacle.prototype = Object.create(THREE.Object3D.prototype);
 
 OctopusTentacle.prototype.build = function()
 {
-	var sphere = new THREE.SphereGeometry(5, this.genome.sphereDetail, 
-		this.genome.sphereDetail);
-	var cylinder = new THREE.CylinderGeometry(5, 5, 5, this.genome.cylinderDetail, 
-		2, false);
+	var sphere = new THREE.SphereGeometry(
+		this.genome.tentBaseRadius, 			// radius
+		this.genome.sphereDetail, 				// width segments
+		this.genome.sphereDetail);				// height segments
+
+	var cylinder = new THREE.CylinderGeometry(
+		this.genome.tentBaseRadius,				// top radius 
+		this.genome.tentBaseRadius,				// bottom radius
+		this.genome.tentBaseRadius, 			// height
+		this.genome.cylinderDetail, 			// radius segments
+		2, 										// height segments
+		false);									// open ended
 	cylinder.computeBoundingBox();
+
 	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x222222 } );
 	//var mat = new THREE.MeshNormalMaterial();
 
-	// loop here and create joints
+	// loop here and create the joints
 	var prevObj = this;
 	for (var i=0; i<this.genome.numJoints; i++)
 	{
@@ -118,7 +129,8 @@ OctopusTentacle.prototype.build = function()
 			joint.position.y = cylinder.boundingBox.max.y*2;
 			// scale down and rotate the joint
 			joint.scale = new THREE.Vector3(0.92, 0.92, 0.92);
-			joint.rotation.z += -Math.PI/20;
+//			joint.rotation.z += -Math.PI/20;
+			joint.rotation.z = this.getJointRotation(this.rotationCounter, i);
 		}
 
 		// add the new joint to the previous one
@@ -140,7 +152,12 @@ OctopusTentacle.prototype.animate = function(deltaTimeMS)
 
 	for (var i=1; i<this.joints.length; i++)
 	{
-		var rot = Math.sin(this.rotationCounter+(i*(Math.PI/20)))*(Math.PI/10);
+		var rot = this.getJointRotation(this.rotationCounter, i);
 		this.joints[i].rotation.z = rot;
 	}
+}
+
+OctopusTentacle.prototype.getJointRotation = function(time, jIndex)
+{
+	return Math.sin(time+(jIndex*(Math.PI/20)))*(Math.PI/10);
 }

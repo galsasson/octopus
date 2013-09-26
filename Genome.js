@@ -5,6 +5,7 @@ function Genome()
 	this.headRadius = 30;
 
 	// tentacles stuff
+	this.tentBaseRadius = 5;
 	this.numTents = 8;
 	this.numJoints = 25;
 

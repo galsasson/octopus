@@ -1,11 +1,14 @@
 var renderer = null;
 var scene = null;
+
+var controls = null;
 var camera = null;
-var animating = false;
 
 var octopus = null;
 
 var clock = null;
+
+var animating = true;
 
 //***************************************************************************//
 // initialize the renderer, scene, camera, and lights                        //
@@ -17,7 +20,7 @@ function onLoad()
 
     // Create the Three.js renderer, add it to our div
     renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setSize(container.offsetWidth, container.offsetHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0);
     container.appendChild( renderer.domElement );
 
@@ -25,9 +28,12 @@ function onLoad()
     scene = new THREE.Scene();
 
     // Put in a camera
-    camera = new THREE.PerspectiveCamera( 45,
-        container.offsetWidth / container.offsetHeight, 1, 4000 );
-    camera.position.set( 0, -20, 180);
+    camera = new THREE.PerspectiveCamera( 60, 
+        window.innerWidth / window.innerHeight, 1, 4000 );
+        
+    camera.position.set( 0, 0, 180);
+    controls = new THREE.OrbitControls(camera);
+    controls.addEventListener( 'change', render );
 
     // Create a directional light to show off the object
     var light = new THREE.DirectionalLight( 0xffffff, 1);
@@ -38,8 +44,10 @@ function onLoad()
 
     // Add a mouse up handler to toggle the animation
     addMouseHandler();
+    window.addEventListener( 'resize', onWindowResize, false );
 
     clock = new THREE.Clock();
+
     // Run our render loop
 	run();
 }
@@ -54,7 +62,7 @@ function populateScene()
     octopus = new Octopus(genome);
     octopus.build();
 
-    // octopus.rotation.x = -Math.PI/2;
+    octopus.rotation.y = Math.PI/20;
 
     scene.add(octopus);
 }
@@ -66,18 +74,22 @@ function run()
 {
     var deltaMS = clock.getDelta()*1000;
 
-    // Render the scene
-    renderer.render( scene, camera );
-    // Spin the cube for next frame
+    render();
+
     if (animating)
     {
-        var time = new Date().getTime();
-
         octopus.animate(deltaMS);
     }
 
     // Ask for another frame
     requestAnimationFrame(run);
+    controls.update();
+}
+
+// Render the scene
+function render()
+{
+    renderer.render(scene, camera);    
 }
 
 //***************************************************************************//
@@ -87,10 +99,38 @@ function addMouseHandler()
 {
     var dom = renderer.domElement;
     dom.addEventListener( 'mouseup', onMouseUp, false);
+    dom.addEventListener( 'mousedown', onMouseDown, false);
+}
+
+function onMouseDown(event)
+{
+    event.preventDefault();
+    animating = false;
 }
 
 function onMouseUp(event)
 {
     event.preventDefault();
-    animating = !animating;
+    animating = true;
+}
+
+function onMouseMove(event)
+{
+    event.preventDefault();
+    if (dragging) {
+        var x = prevMouse.x - event.x;
+        var y = prevMouse.y - event.y;
+        camera.rotation.y -= x/1000;
+
+        prevMouse.x = event.x;
+        prevMouse.y = event.y;
+    }
+}
+
+function onWindowResize() 
+{
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
