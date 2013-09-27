@@ -1,6 +1,6 @@
 
 //***************************************************************************//
-// Octopus (inherits form Object3D)                                            //
+// Octopus (inherits form Object3D)                                          //
 //***************************************************************************//
 
 Octopus = function(genome)
@@ -52,7 +52,7 @@ Octopus.prototype.animate = function(deltaTimeMS)
 	}
 }
 //***************************************************************************//
-// OctopusHead (inherits from Object3D)                                        //
+// OctopusHead (inherits from Object3D)                                      //
 //***************************************************************************//
 OctopusHead = function(genome)
 {
@@ -68,15 +68,14 @@ OctopusHead.prototype.build = function()
 		this.genome.headRadius,				// radius
 		this.genome.sphereDetail, 			// width segments
 		this.genome.sphereDetail);			// height segments
-	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0xaaaaaa } );
-	// var mat = new THREE.MeshNormalMaterial();
+	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
 
 	this.add(new THREE.Mesh(sphere, mat));
 }
 
 
 //***************************************************************************//
-// OctopusTentacle (inherits from Object3D)                                    //
+// OctopusTentacle (inherits from Object3D)                                  //
 //***************************************************************************//
 OctopusTentacle = function(index, genome)
 {
@@ -106,8 +105,7 @@ OctopusTentacle.prototype.build = function()
 		false);									// open ended
 	cylinder.computeBoundingBox();
 
-	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x222222 } );
-	//var mat = new THREE.MeshNormalMaterial();
+	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
 
 	// loop here and create the joints
 	var prevObj = this;
@@ -129,7 +127,6 @@ OctopusTentacle.prototype.build = function()
 			joint.position.y = cylinder.boundingBox.max.y*2;
 			// scale down and rotate the joint
 			joint.scale = new THREE.Vector3(0.92, 0.92, 0.92);
-//			joint.rotation.z += -Math.PI/20;
 			joint.rotation.z = this.getJointRotation(this.rotationCounter, i);
 		}
 

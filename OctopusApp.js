@@ -35,10 +35,12 @@ function onLoad()
     controls = new THREE.OrbitControls(camera);
     controls.addEventListener( 'change', render );
 
-    // Create a directional light to show off the object
-    var light = new THREE.DirectionalLight( 0xffffff, 1);
-    light.position.set(0, 0, 1);
-    scene.add( light );
+    // Create an ambient and a directional light to show off the object
+    var ambLight = new THREE.AmbientLight( 0x808080 ); // soft white light
+    var dirLight = new THREE.DirectionalLight( 0xffeeaa, 1);
+    dirLight.position.set(0, 0, 1);
+    scene.add( ambLight );
+    scene.add( dirLight );
 
     populateScene();
 
