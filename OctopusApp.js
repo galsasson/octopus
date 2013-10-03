@@ -38,8 +38,8 @@ function onLoad()
     controls.addEventListener( 'change', render );
 
     // Create an ambient and a directional light to show off the object
-    var ambLight = new THREE.AmbientLight( 0x808080 ); // soft white light
-    var dirLight = new THREE.DirectionalLight( 0xffeeaa, 1);
+    var ambLight = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
+    var dirLight = new THREE.DirectionalLight( 0xffffff, 1);
     dirLight.position.set(0, 0, 1);
     scene.add( ambLight );
     scene.add( dirLight );
@@ -68,10 +68,15 @@ function populateScene()
 
     octopus = new Octopus(genome);
     octopus.build();
-
     octopus.rotation.y = Math.PI/20;
-
     scene.add(octopus);
+
+    planeGeo = new THREE.PlaneGeometry(5000, 5000, 2, 2);
+    planeMesh = new THREE.Mesh(planeGeo, resMgr.materials.basic);
+    planeMesh.rotation.x = -Math.PI/2;
+    planeMesh.position.y = -100;
+    scene.add(planeMesh);
+
 }
 
 //***************************************************************************//
@@ -155,4 +160,12 @@ function getKeyCode(evt)
         return window.event.keyCode;
     else
         return evt.which;
+}
+
+function map(i, sStart, sEnd, tStart, tEnd)
+{
+    var v = i-sStart;
+    var sRange = sEnd - sStart;
+    var tMax = tEnd - tStart;
+    return v / sRange * tMax;
 }

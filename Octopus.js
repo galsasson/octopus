@@ -70,7 +70,7 @@ OctopusHead.prototype.build = function()
 		this.genome.sphereDetail,
 		0, Math.PI*2,
 		0, Math.PI);			// height segments
-	var mat = resMgr.materials[0];//new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
+	var mat = resMgr.materials.black;
 
 	this.add(new THREE.Mesh(sphere, mat));
 }
@@ -109,28 +109,26 @@ OctopusTentacle.prototype.build = function()
 		false);									// open ended
 	cylinder.computeBoundingBox();
 
-	var hairSphere = new THREE.SphereGeometry(
+	var spikeSphere = new THREE.SphereGeometry(
 			this.genome.tentBaseRadius, 			// radius
 			this.genome.sphereDetail, 				// width segments
 			this.genome.sphereDetail);				// height segments
-
-	var mat = [];
-	mat[0] = resMgr.materials[0];//new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
-	mat[1] = resMgr.materials[1];//new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x111111 } );
 
 	// loop here and create the joints
 	var prevObj = this;
 	for (var i=0; i<this.genome.numJoints; i++)
 	{
+		var mat = resMgr.materials.colors[Math.floor(map((i*this.genome.tentColorInc)%this.genome.numJoints, 0, this.genome.numJoints, 0, 12))];
 		var joint = new THREE.Object3D();
 
 		// add a cylinder as the joint arm 
-		var cylinderMesh = new THREE.Mesh(cylinder, mat[i%2]);
+		var cylinderMesh = new THREE.Mesh(cylinder, 
+			resMgr.materials.gray );
 		cylinderMesh.position.y += cylinder.boundingBox.max.y;
 		joint.add(cylinderMesh);
 
 		// add a sphere for the joint top
-		var sphereMesh = new THREE.Mesh(sphere, mat[i%2]);
+		var sphereMesh = new THREE.Mesh(sphere, mat);
 		sphereMesh.position.y += cylinder.boundingBox.max.y*2;
 		joint.add(sphereMesh);
 
@@ -141,21 +139,8 @@ OctopusTentacle.prototype.build = function()
 			joint.rotation.z = this.getJointRotation(this.rotationCounter, i);
 		}
 
-		if (i > 2) {
-			// build hairs on the tentacle
-			var hairs = [];
-			for (var h=0; h<12; h++)
-			{
-				var hairMesh = new THREE.Mesh(hairSphere, resMgr.materials[h+2]);//mat[i%2]);
-				hairs[h] = new THREE.Object3D();
-				joint.add(hairs[h]);
-				hairMesh.scale.x *= 0.2;
-				hairMesh.scale.z *= 0.2;
-				hairMesh.position.y = this.genome.tentBaseRadius;
-				hairs[h].add(hairMesh);
-				hairs[h].rotation.z = Math.PI/2;
-				hairs[h].rotation.y = Math.PI/6*h;		// controls overall arc degree (0-360)
-			}
+		if (i > 0) {
+			this.makeSpikes(joint, spikeSphere, mat);
 		}
 
 		// add the new joint to the previous one
@@ -165,6 +150,27 @@ OctopusTentacle.prototype.build = function()
 
 		// remember last joint so we'll know what to attach to
 		prevObj = joint;
+	}
+}
+
+OctopusTentacle.prototype.makeSpikes = function(joint, geo, material)
+{
+	// build hairs on the tentacle
+	var hairs = [];
+	var spikesNum = this.genome.numSpikesPerJoint;
+	var arcStart = this.genome.spikesArcStart;
+	var arcEnd = this.genome.spikesArcEnd;
+	for (var h=0; h<spikesNum; h++)
+	{
+		var hairMesh = new THREE.Mesh(geo, material);//resMgr.materials.gray);//colors[map(h, 0, spikesNum, 0, 12)]);
+		hairs[h] = new THREE.Object3D();
+		joint.add(hairs[h]);
+		hairMesh.scale.x *= 0.2;
+		hairMesh.scale.z *= 0.2;
+		hairMesh.position.y = this.genome.tentBaseRadius/2;
+		hairs[h].add(hairMesh);
+		hairs[h].rotation.z = Math.PI/2;
+		hairs[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h;		
 	}
 }
 
@@ -184,5 +190,5 @@ OctopusTentacle.prototype.animate = function(deltaTimeMS)
 
 OctopusTentacle.prototype.getJointRotation = function(time, jIndex)
 {
-	return Math.sin(time+(jIndex*(Math.PI/20)))*(Math.PI/10);
+	return Math.sin(time/2+(jIndex*(Math.PI/50)))*(Math.PI/10);
 }

@@ -1,22 +1,25 @@
 
 ResourceManager = function()
 {
-	this.materials = [];
+	this.materials = {};
 }
 
 ResourceManager.prototype.initMaterials = function()
 {
-	// white
-	this.materials[0] = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
-	// black
-	this.materials[1] = new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x111111 } );
-	// colors
-	for (var i=2; i<14; i++)
+	this.materials.white = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
+	this.materials.gray = new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x333333 } );
+	this.materials.black = new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x111111 } );
+	this.materials.colors = [];
+	for (var i=0; i<12; i++)
 	{
 		var c = new THREE.Color();
-		c.setHSL(Math.PI*2/Math.PI*2/12*i, 1, 1);
-		this.materials[i] = new THREE.MeshLambertMaterial( { color: c, ambient: 0x888888 } );
+		c = c.setHSL(i/12, 0.5, 0.5);
+		var ca = new THREE.Color();
+		ca.setHSL(i/12, 0.5, 0.3);
+		this.materials.colors[i] = new THREE.MeshLambertMaterial( { color: c, ambient: ca } );
 	}
+
+	this.materials.basic = new THREE.MeshBasicMaterial( {color:0xdddddd });
 }
 
 ResourceManager.prototype.constructor = ResourceManager;
