@@ -105,7 +105,9 @@ OctopusTentacle.prototype.build = function()
 		false);									// open ended
 	cylinder.computeBoundingBox();
 
-	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
+	var mat = [];
+	mat[0] = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
+	mat[1] = new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x111111 } );
 
 	// loop here and create the joints
 	var prevObj = this;
@@ -114,12 +116,12 @@ OctopusTentacle.prototype.build = function()
 		var joint = new THREE.Object3D();
 
 		// add a cylinder as the joint arm 
-		var cylinderMesh = new THREE.Mesh(cylinder, mat);
+		var cylinderMesh = new THREE.Mesh(cylinder, mat[i%2]);
 		cylinderMesh.position.y += cylinder.boundingBox.max.y;
 		joint.add(cylinderMesh);
 
 		// add a sphere for the joint top
-		var sphereMesh = new THREE.Mesh(sphere, mat);
+		var sphereMesh = new THREE.Mesh(sphere, mat[i%2]);
 		sphereMesh.position.y += cylinder.boundingBox.max.y*2;
 		joint.add(sphereMesh);
 

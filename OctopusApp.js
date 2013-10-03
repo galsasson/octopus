@@ -45,7 +45,7 @@ function onLoad()
     populateScene();
 
     // Add a mouse up handler to toggle the animation
-    addMouseHandler();
+    addInputHandler();
     window.addEventListener( 'resize', onWindowResize, false );
 
     clock = new THREE.Clock();
@@ -97,23 +97,30 @@ function render()
 //***************************************************************************//
 // User interaction                                                          //
 //***************************************************************************//
-function addMouseHandler()
+function addInputHandler()
 {
     var dom = renderer.domElement;
-    dom.addEventListener( 'mouseup', onMouseUp, false);
-    dom.addEventListener( 'mousedown', onMouseDown, false);
+    dom.addEventListener('mouseup', onMouseUp, false);
+    dom.addEventListener('mousedown', onMouseDown, false);
+    window.addEventListener('keydown', onKeyDown, false);
+}
+
+function onKeyDown(evt)
+{
+    var keyCode = getKeyCode(evt);
+    if (keyCode == 32) {
+        animating = !animating;        
+    }
 }
 
 function onMouseDown(event)
 {
     event.preventDefault();
-    animating = false;
 }
 
 function onMouseUp(event)
 {
     event.preventDefault();
-    animating = true;
 }
 
 function onMouseMove(event)
@@ -135,4 +142,12 @@ function onWindowResize()
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function getKeyCode(evt)
+{
+    if (window.event != null) 
+        return window.event.keyCode;
+    else
+        return evt.which;
 }
