@@ -67,7 +67,9 @@ OctopusHead.prototype.build = function()
 	var sphere = new THREE.SphereGeometry(
 		this.genome.headRadius,				// radius
 		this.genome.sphereDetail, 			// width segments
-		this.genome.sphereDetail);			// height segments
+		this.genome.sphereDetail,
+		0, Math.PI*2,
+		0, Math.PI);			// height segments
 	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
 
 	this.add(new THREE.Mesh(sphere, mat));
@@ -76,6 +78,8 @@ OctopusHead.prototype.build = function()
 
 //***************************************************************************//
 // OctopusTentacle (inherits from Object3D)                                  //
+//                                                                           //
+// Tantacle lays on the x axis facing +                                      //
 //***************************************************************************//
 OctopusTentacle = function(index, genome)
 {
@@ -105,6 +109,11 @@ OctopusTentacle.prototype.build = function()
 		false);									// open ended
 	cylinder.computeBoundingBox();
 
+	var hairSphere = new THREE.SphereGeometry(
+			this.genome.tentBaseRadius, 			// radius
+			this.genome.sphereDetail, 				// width segments
+			this.genome.sphereDetail);				// height segments
+
 	var mat = [];
 	mat[0] = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
 	mat[1] = new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x111111 } );
@@ -125,11 +134,29 @@ OctopusTentacle.prototype.build = function()
 		sphereMesh.position.y += cylinder.boundingBox.max.y*2;
 		joint.add(sphereMesh);
 
-		if (i!=0) {
+		if (i > 0) {
 			joint.position.y = cylinder.boundingBox.max.y*2;
 			// scale down and rotate the joint
 			joint.scale = new THREE.Vector3(0.92, 0.92, 0.92);
 			joint.rotation.z = this.getJointRotation(this.rotationCounter, i);
+		}
+
+		if (i > 2) {
+			// build hairs on the tentacle
+			var hairs = [];
+			for (var h=0; h<12; h++)
+			{
+				var hairMesh = new THREE.Mesh(hairSphere, mat[i%2]);
+				hairs[h] = new THREE.Object3D();
+				joint.add(hairs[h]);
+				hairMesh.scale.x *= 0.2;
+				hairMesh.scale.z *= 0.2;
+				hairMesh.position.x = this.genome.tentBaseRadius*2-2;
+				hairMesh.position.y = this.genome.tentBaseRadius;
+				hairs[h].add(hairMesh);
+				hairs[h].rotation.z = Math.PI/2;
+				hairs[h].rotation.y = Math.PI/6*h;		// controls overall arc degree (0-360)
+			}
 		}
 
 		// add the new joint to the previous one
