@@ -70,7 +70,7 @@ OctopusHead.prototype.build = function()
 		this.genome.sphereDetail,
 		0, Math.PI*2,
 		0, Math.PI);			// height segments
-	var mat = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
+	var mat = resMgr.materials[0];//new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
 
 	this.add(new THREE.Mesh(sphere, mat));
 }
@@ -115,8 +115,8 @@ OctopusTentacle.prototype.build = function()
 			this.genome.sphereDetail);				// height segments
 
 	var mat = [];
-	mat[0] = new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
-	mat[1] = new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x111111 } );
+	mat[0] = resMgr.materials[0];//new THREE.MeshLambertMaterial( { color: 0x888888, ambient: 0x444444 } );
+	mat[1] = resMgr.materials[1];//new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x111111 } );
 
 	// loop here and create the joints
 	var prevObj = this;
@@ -146,12 +146,11 @@ OctopusTentacle.prototype.build = function()
 			var hairs = [];
 			for (var h=0; h<12; h++)
 			{
-				var hairMesh = new THREE.Mesh(hairSphere, mat[i%2]);
+				var hairMesh = new THREE.Mesh(hairSphere, resMgr.materials[h+2]);//mat[i%2]);
 				hairs[h] = new THREE.Object3D();
 				joint.add(hairs[h]);
 				hairMesh.scale.x *= 0.2;
 				hairMesh.scale.z *= 0.2;
-				hairMesh.position.x = this.genome.tentBaseRadius*2-2;
 				hairMesh.position.y = this.genome.tentBaseRadius;
 				hairs[h].add(hairMesh);
 				hairs[h].rotation.z = Math.PI/2;

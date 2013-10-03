@@ -10,6 +10,8 @@ var clock = null;
 
 var animating = true;
 
+var resMgr = new ResourceManager();
+
 //***************************************************************************//
 // initialize the renderer, scene, camera, and lights                        //
 //***************************************************************************//
@@ -41,6 +43,9 @@ function onLoad()
     dirLight.position.set(0, 0, 1);
     scene.add( ambLight );
     scene.add( dirLight );
+
+    // load resources
+    resMgr.initMaterials();
 
     populateScene();
 
