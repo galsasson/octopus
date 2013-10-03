@@ -30,13 +30,15 @@ Octopus.prototype.build = function()
 		// rotate tent by 180 degrees, so it will point down
 		this.tents[i].rotation.z += Math.PI;
 		// move tent to the bottom of the head's surface (a little less, so it be a little inside)
-		this.tents[i].position.y-=this.genome.headRadius-2;
+		this.tents[i].position.y-=this.genome.headBaseRadius-2;
 
 		// this will control the tent position on the head surface
 		this.tentPosers[i] = new THREE.Object3D();
 
 		this.tentPosers[i].add(this.tents[i]);
-		this.tentPosers[i].rotation.z = -Math.PI/4;
+
+		// determines the angle from the bottom center
+		this.tentPosers[i].rotation.z = -Math.PI/3;
 
 		this.tentPosers[i].rotation.y = i*radPerTent;
 
@@ -65,14 +67,32 @@ OctopusHead.prototype = Object.create(THREE.Object3D.prototype);
 OctopusHead.prototype.build = function()
 {
 	var sphere = new THREE.SphereGeometry(
-		this.genome.headRadius,				// radius
-		this.genome.sphereDetail, 			// width segments
-		this.genome.sphereDetail,
-		0, Math.PI*2,
-		0, Math.PI);			// height segments
-	var mat = resMgr.materials.black;
+	this.genome.headBaseRadius,			// radius
+	this.genome.sphereDetail, 			// width segments
+	this.genome.sphereDetail,           // height segments
+	0, Math.PI*2,
+	0, Math.PI);
 
-	this.add(new THREE.Mesh(sphere, mat));
+	var headGeo = new THREE.Geometry();
+	var headLength = 10;
+	this.circleMeshes = [];
+	var lastObj = this;
+	var moveY = this.genome.headBaseRadius/2;
+	for (var i=0; i<headLength; i++)
+	{
+		this.circleMeshes[i] = new THREE.Mesh(sphere, resMgr.materials.black);
+		if (i>0) {
+			this.circleMeshes[i].scale = this.genome.headJointsScaleFactor;
+			this.circleMeshes[i].position.y += moveY;
+			moveY *= this.genome.headJointsScaleFactor.y;
+			this.circleMeshes[i].rotation.x = -Math.PI/15;
+		}
+
+		lastObj.add(this.circleMeshes[i]);
+		lastObj = this.circleMeshes[i];
+
+
+	}
 }
 
 

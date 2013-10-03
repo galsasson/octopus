@@ -167,5 +167,5 @@ function map(i, sStart, sEnd, tStart, tEnd)
     var v = i-sStart;
     var sRange = sEnd - sStart;
     var tMax = tEnd - tStart;
-    return v / sRange * tMax;
+    return tStart + v / sRange * tMax;
 }

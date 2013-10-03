@@ -13,9 +13,10 @@ ResourceManager.prototype.initMaterials = function()
 	for (var i=0; i<12; i++)
 	{
 		var c = new THREE.Color();
-		c = c.setHSL(i/12, 0.5, 0.5);
+		console.log(map(i, 0, 12, 0.6, 0.2));
+		c = c.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.5);
 		var ca = new THREE.Color();
-		ca.setHSL(i/12, 0.5, 0.3);
+		ca.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.3);
 		this.materials.colors[i] = new THREE.MeshLambertMaterial( { color: c, ambient: ca } );
 	}
 
