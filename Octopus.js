@@ -10,6 +10,8 @@ Octopus = function(genome)
 	this.genome = genome;
 	this.tents = [];
 	this.tentPosers = [];
+	this.feeling = "normal";
+	//this.feeling = "scared";
 }
 Octopus.prototype = Object.create(THREE.Object3D.prototype);
 
@@ -44,6 +46,14 @@ Octopus.prototype.build = function()
 
 		this.add(this.tentPosers[i]);
 	}
+}
+
+Octopus.prototype.setFeeling = function(feeling, delay)
+{
+	for (var i=0; i<this.tents.length; i++)
+	{
+		this.tents[i].setFeeling(feeling, delay);
+	}	
 }
 
 Octopus.prototype.animate = function(deltaTimeMS)
@@ -107,6 +117,11 @@ OctopusTentacle = function(index, genome)
 
 	this.genome = genome;
 	this.joints = [];
+	this.feeling = "normal";
+	this.startTime = 0;
+	this.endTime = 0;
+	this.sourceRotationZ = 0;
+	this.targetRotationZ = 0;
 
 	// set initial rotation counter
 	this.rotationCounter = 3;
@@ -180,19 +195,18 @@ OctopusTentacle.prototype.makeSpikes = function(joint, geo, material)
 	var arcStart = this.genome.spikesArcStart;
 	var arcEnd = this.genome.spikesArcEnd;
 
-	joint.hairs = [];
+	joint.spikes = [];
 	for (var h=0; h<spikesNum; h++)
 	{
-		var hairMesh = new THREE.Mesh(geo, material);
-		joint.hairs[h] = new THREE.Object3D();
-		joint.add(joint.hairs[h]);
-		hairMesh.scale.x *= 0.2;
-		hairMesh.scale.z *= 0.2;
-		//hairMesh.position.y = this.genome.tentBaseRadius;
-		joint.hairs[h].add(hairMesh);
-		joint.hairs[h].rotation.z = Math.PI/5;
-		joint.hairs[h].position.y -= 50;
-		joint.hairs[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h + Math.random()*Math.PI/10;
+		var spikeMesh = new THREE.Mesh(geo, material);
+		joint.spikes[h] = new THREE.Object3D();
+		joint.add(joint.spikes[h]);
+		spikeMesh.scale = this.genome.spikeScale;
+		spikeMesh.position.y = this.genome.tentBaseRadius+2;
+		joint.spikes[h].add(spikeMesh);
+		joint.spikes[h].position.y -= 2;
+		joint.spikes[h].rotation.z = Math.PI/6;
+		joint.spikes[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h + Math.random()*Math.PI/10;
 	}
 }
 
@@ -201,7 +215,7 @@ OctopusTentacle.prototype.animate = function(deltaTimeMS)
 	var maxRotation = Math.PI/5;
 	var maxOffset = Math.PI/225;
 
-	this.rotationCounter += deltaTimeMS/800;
+	this.rotationCounter += deltaTimeMS/1000;
 
 	for (var i=1; i<this.joints.length; i++)
 	{
@@ -210,13 +224,31 @@ OctopusTentacle.prototype.animate = function(deltaTimeMS)
 		var rot = this.getJointRotation(this.rotationCounter, i);
 		joint.rotation.z = rot;
 
+		// do spike z rotation
+		var spikeRotZ = map(this.rotationCounter, 
+			this.startTime, this.endTime, 
+			this.sourceRotationZ, this.targetRotationZ);
+
 		// animate hair on joint
-		for (var h=0; h<joint.hairs.length; h++)
-		{
-			var rot = this.getHairRotation(this.rotationCounter, h);
-			//console.log(rot);
-			joint.hairs[h].children[0].rotation.z = Math.PI/6 + Math.sin(this.rotationCounter*4)*Math.PI/6;
+		for (var h=0; h<joint.spikes.length; h++) {
+			joint.spikes[h].children[0].rotation.z = spikeRotZ;
 		}
+	}
+}
+
+OctopusTentacle.prototype.setFeeling = function(feeling, delay)
+{
+	this.feeling = feeling;
+
+	this.startTime = this.rotationCounter;
+	this.endTime = this.startTime + delay;
+
+	if (feeling == "normal") {
+		this.sourceRotationZ = this.joints[1].spikes[0].children[0].rotation.z;
+		this.targetRotationZ = 0;
+	} else if (feeling == "scared") {
+		this.sourceRotationZ = this.joints[1].spikes[0].children[0].rotation.z;
+		this.targetRotationZ = Math.PI/3;
 	}
 }
 

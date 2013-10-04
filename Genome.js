@@ -8,12 +8,14 @@ function Genome()
 	// tentacles stuff
 	this.tentBaseRadius = 4;
 	this.numTents = 6;
-	this.numJoints = 25;
+	this.numJoints = 20;
 	this.numSpikesPerJoint = 12;
 	this.spikesArcStart = 0;
 	this.spikesArcEnd = Math.PI*2;
 	this.tentColorInc = 1;
 	this.tentColorBW = false;
+
+	this.spikeScale = new THREE.Vector3(0.15, 1.2, 0.15);
 
 	this.sphereDetail = 20;
 	this.cylinderDetail = 20;

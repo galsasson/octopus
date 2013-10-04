@@ -12,6 +12,8 @@ var animating = true;
 
 var resMgr = null;
 
+var sPressed = false;
+
 //***************************************************************************//
 // initialize the renderer, scene, camera, and lights                        //
 //***************************************************************************//
@@ -67,7 +69,6 @@ function populateScene()
     // load resources
     resMgr.initMaterials();
 
-
     octopus = new Octopus(genome);
     octopus.build();
     octopus.rotation.y = Math.PI/20;
@@ -115,13 +116,34 @@ function addInputHandler()
     dom.addEventListener('mouseup', onMouseUp, false);
     dom.addEventListener('mousedown', onMouseDown, false);
     window.addEventListener('keydown', onKeyDown, false);
+    window.addEventListener('keyup', onKeyUp, false);
 }
 
 function onKeyDown(evt)
 {
     var keyCode = getKeyCode(evt);
+
     if (keyCode == 32) {
         animating = !animating;        
+    }
+    else if (keyCode == 83)
+    {
+        if (!sPressed) {
+            sPressed = true;
+            octopus.setFeeling("scared", 0.08);
+        }
+    }
+}
+
+function onKeyUp(evt)
+{
+    var keyCode = getKeyCode(evt);
+
+    if (keyCode == 83) {
+        if (sPressed) {
+            octopus.setFeeling("normal", 0.2);
+            sPressed = false;
+        }
     }
 }
 
@@ -167,7 +189,24 @@ function getKeyCode(evt)
 function map(i, sStart, sEnd, tStart, tEnd)
 {
     var v = i-sStart;
+    if (v>=0) {
+        if (i < sStart) {
+            return tStart;
+        } else if (i > sEnd) {
+            return tEnd;
+        }
+    } else {
+        if (i > sStart) {
+            return tStart;
+        } else if (i < sEnd){
+            return tEnd;
+        }
+    }
     var sRange = sEnd - sStart;
+    if (sRange == 0) {
+        return tStart;
+    }
+
     var tMax = tEnd - tStart;
     return tStart + v / sRange * tMax;
 }

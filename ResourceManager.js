@@ -21,8 +21,8 @@ ResourceManager.prototype.initMaterials = function()
 			ca.setHSL(0, 0, map(i, 0, 12, 0.1, 0.3));
 		}
 		else {
-			c.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.5);
-			ca.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.3);
+			c.setHSL(map(i, 0, 12, 1, 0.5), 0.5, 0.5);
+			ca.setHSL(map(i, 0, 12, 1, 0.5), 0.5, 0.3);
 		}
 		this.materials.colors[i] = new THREE.MeshLambertMaterial( { color: c, ambient: ca } );
 	}
