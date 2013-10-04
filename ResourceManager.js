@@ -1,6 +1,7 @@
 
-ResourceManager = function()
+ResourceManager = function(genome)
 {
+	this.genome = genome;
 	this.materials = {};
 }
 
@@ -13,10 +14,16 @@ ResourceManager.prototype.initMaterials = function()
 	for (var i=0; i<12; i++)
 	{
 		var c = new THREE.Color();
-		console.log(map(i, 0, 12, 0.6, 0.2));
-		c = c.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.5);
 		var ca = new THREE.Color();
-		ca.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.3);
+
+		if (this.genome.tentColorBW) {			
+			c.setHSL(0, 0, map(i, 0, 12, 0.1, 1));
+			ca.setHSL(0, 0, map(i, 0, 12, 0.1, 0.3));
+		}
+		else {
+			c.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.5);
+			ca.setHSL(map(i, 0, 12, 0.6, 0.2), 0.5, 0.3);
+		}
 		this.materials.colors[i] = new THREE.MeshLambertMaterial( { color: c, ambient: ca } );
 	}
 

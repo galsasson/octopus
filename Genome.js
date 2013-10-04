@@ -13,6 +13,7 @@ function Genome()
 	this.spikesArcStart = 0;
 	this.spikesArcEnd = Math.PI*2;
 	this.tentColorInc = 1;
+	this.tentColorBW = false;
 
 	this.sphereDetail = 20;
 	this.cylinderDetail = 20;

@@ -182,15 +182,15 @@ OctopusTentacle.prototype.makeSpikes = function(joint, geo, material)
 	var arcEnd = this.genome.spikesArcEnd;
 	for (var h=0; h<spikesNum; h++)
 	{
-		var hairMesh = new THREE.Mesh(geo, material);//resMgr.materials.gray);//colors[map(h, 0, spikesNum, 0, 12)]);
+		var hairMesh = new THREE.Mesh(geo, material);
 		hairs[h] = new THREE.Object3D();
 		joint.add(hairs[h]);
 		hairMesh.scale.x *= 0.2;
 		hairMesh.scale.z *= 0.2;
-		hairMesh.position.y = this.genome.tentBaseRadius/2;
+		hairMesh.position.y = this.genome.tentBaseRadius;
 		hairs[h].add(hairMesh);
 		hairs[h].rotation.z = Math.PI/2;
-		hairs[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h;		
+		hairs[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h + Math.random()*Math.PI/10;		
 	}
 }
 
@@ -210,5 +210,5 @@ OctopusTentacle.prototype.animate = function(deltaTimeMS)
 
 OctopusTentacle.prototype.getJointRotation = function(time, jIndex)
 {
-	return Math.sin(time/2+(jIndex*(Math.PI/50)))*(Math.PI/10);
+	return Math.sin(time+(jIndex*(Math.PI/50)))*(Math.PI/10) + Math.sin(jIndex/10)*-Math.PI/10;
 }

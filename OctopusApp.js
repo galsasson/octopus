@@ -10,7 +10,7 @@ var clock = null;
 
 var animating = true;
 
-var resMgr = new ResourceManager();
+var resMgr = null;
 
 //***************************************************************************//
 // initialize the renderer, scene, camera, and lights                        //
@@ -44,9 +44,6 @@ function onLoad()
     scene.add( ambLight );
     scene.add( dirLight );
 
-    // load resources
-    resMgr.initMaterials();
-
     populateScene();
 
     // Add a mouse up handler to toggle the animation
@@ -65,6 +62,11 @@ function onLoad()
 function populateScene()
 {
     var genome = new Genome();
+    resMgr = new ResourceManager(genome);
+
+    // load resources
+    resMgr.initMaterials();
+
 
     octopus = new Octopus(genome);
     octopus.build();
