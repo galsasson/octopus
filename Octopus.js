@@ -100,8 +100,6 @@ OctopusHead.prototype.build = function()
 
 		lastObj.add(this.circleMeshes[i]);
 		lastObj = this.circleMeshes[i];
-
-
 	}
 }
 
@@ -174,8 +172,8 @@ OctopusTentacle.prototype.build = function()
 			joint.rotation.z = this.getJointRotation(this.rotationCounter, i);
 		}
 
-		if (i > 0) {
-			this.makeSpikes(joint, spikeSphere, mat);
+		if (i >= 0) {
+			this.makeSpikes(joint, spikeSphere, resMgr.materials.gray);//mat);
 		}
 
 		// add the new joint to the previous one
@@ -217,12 +215,14 @@ OctopusTentacle.prototype.animate = function(deltaTimeMS)
 
 	this.rotationCounter += deltaTimeMS/1000;
 
-	for (var i=1; i<this.joints.length; i++)
+	for (var i=0; i<this.joints.length; i++)
 	{
 		var joint = this.joints[i];
 
-		var rot = this.getJointRotation(this.rotationCounter, i);
-		joint.rotation.z = rot;
+		if (i>0) {
+			var rot = this.getJointRotation(this.rotationCounter, i);
+			joint.rotation.z = rot;
+		}
 
 		// do spike z rotation
 		var spikeRotZ = map(this.rotationCounter, 

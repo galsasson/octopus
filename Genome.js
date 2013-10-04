@@ -15,7 +15,8 @@ function Genome()
 	this.tentColorInc = 1;
 	this.tentColorBW = false;
 
-	this.spikeScale = new THREE.Vector3(0.15, 1.2, 0.15);
+	//this.spikeScale = new THREE.Vector3(0.15, 1.2, 0.15);
+	this.spikeScale = new THREE.Vector3(0.15, 1.4, 0.3);
 
 	this.sphereDetail = 20;
 	this.cylinderDetail = 20;
