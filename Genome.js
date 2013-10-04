@@ -2,12 +2,12 @@
 function Genome()
 {
 	// head stuff
-	this.headBaseRadius = 20;
+	this.headBaseRadius = 10;
 	this.headJointsScaleFactor = new THREE.Vector3(0.9, 0.9, 0.9);
 	this.headScale = new THREE.Vector3(1, 0.8, 1);
 	// tentacles stuff
 	this.tentBaseRadius = 4;
-	this.numTents = 12;
+	this.numTents = 6;
 	this.numJoints = 25;
 	this.numSpikesPerJoint = 12;
 	this.spikesArcStart = 0;
