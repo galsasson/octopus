@@ -107,7 +107,6 @@ OctopusTentacle = function(index, genome)
 
 	this.genome = genome;
 	this.joints = [];
-	this.hairs = [];
 
 	// set initial rotation counter
 	this.rotationCounter = 3;
@@ -180,17 +179,20 @@ OctopusTentacle.prototype.makeSpikes = function(joint, geo, material)
 	var spikesNum = this.genome.numSpikesPerJoint;
 	var arcStart = this.genome.spikesArcStart;
 	var arcEnd = this.genome.spikesArcEnd;
+
+	joint.hairs = [];
 	for (var h=0; h<spikesNum; h++)
 	{
 		var hairMesh = new THREE.Mesh(geo, material);
-		this.hairs[h] = new THREE.Object3D();
-		joint.add(this.hairs[h]);
+		joint.hairs[h] = new THREE.Object3D();
+		joint.add(joint.hairs[h]);
 		hairMesh.scale.x *= 0.2;
 		hairMesh.scale.z *= 0.2;
-		hairMesh.position.y = this.genome.tentBaseRadius;
-		this.hairs[h].add(hairMesh);
-		this.hairs[h].rotation.z = Math.PI/5;
-		this.hairs[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h + Math.random()*Math.PI/10;		
+		//hairMesh.position.y = this.genome.tentBaseRadius;
+		joint.hairs[h].add(hairMesh);
+		joint.hairs[h].rotation.z = Math.PI/5;
+		joint.hairs[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h + Math.random()*Math.PI/10;
+		joint.hairs[h].position.x += 5;
 	}
 }
 
@@ -203,13 +205,18 @@ OctopusTentacle.prototype.animate = function(deltaTimeMS)
 
 	for (var i=1; i<this.joints.length; i++)
 	{
-		var rot = this.getJointRotation(this.rotationCounter, i);
-		this.joints[i].rotation.z = rot;
-	}
+		var joint = this.joints[i];
 
-	for (var h=0; h<this.hairs.length; h++)
-	{
-		this.hairs[h].rotation = this.getHairRotation(this.rotationCounter, h);
+		var rot = this.getJointRotation(this.rotationCounter, i);
+		joint.rotation.z = rot;
+
+		// animate hair on joint
+		for (var h=0; h<joint.hairs.length; h++)
+		{
+			var rot = this.getHairRotation(this.rotationCounter, h);
+			//console.log(rot);
+			joint.hairs[h].children[0].rotation.z = Math.PI/6 + Math.sin(this.rotationCounter*4)*Math.PI/6;
+		}
 	}
 }
 
@@ -221,6 +228,6 @@ OctopusTentacle.prototype.getJointRotation = function(time, jIndex)
 OctopusTentacle.prototype.getHairRotation = function(time, index)
 {
 	rot = new THREE.Vector3();
-	rot.y = Math.sin(time)*Math.PI/2;
+	rot.x = Math.sin(time)*Math.PI;
 	return rot;
 }
