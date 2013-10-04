@@ -191,8 +191,8 @@ OctopusTentacle.prototype.makeSpikes = function(joint, geo, material)
 		//hairMesh.position.y = this.genome.tentBaseRadius;
 		joint.hairs[h].add(hairMesh);
 		joint.hairs[h].rotation.z = Math.PI/5;
+		joint.hairs[h].position.y -= 50;
 		joint.hairs[h].rotation.y = arcStart + ((arcEnd-arcStart)/spikesNum)*h + Math.random()*Math.PI/10;
-		joint.hairs[h].position.x += 5;
 	}
 }
 
