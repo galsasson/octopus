@@ -78,7 +78,7 @@ function populateScene()
     planeMesh = new THREE.Mesh(planeGeo, resMgr.materials.basic);
     planeMesh.rotation.x = -Math.PI/2;
     planeMesh.position.y = -100;
-    scene.add(planeMesh);
+//    scene.add(planeMesh);
 
 }
 
@@ -130,7 +130,7 @@ function onKeyDown(evt)
     {
         if (!sPressed) {
             sPressed = true;
-            octopus.setFeeling("scared", 0.08);
+            octopus.setFeeling("scared", 0.1);
         }
     }
 }

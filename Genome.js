@@ -5,6 +5,7 @@ function Genome()
 	this.headBaseRadius = 10;
 	this.headJointsScaleFactor = new THREE.Vector3(0.9, 0.9, 0.9);
 	this.headScale = new THREE.Vector3(1, 0.8, 1);
+	
 	// tentacles stuff
 	this.tentBaseRadius = 4;
 	this.numTents = 6;
@@ -15,7 +16,6 @@ function Genome()
 	this.tentColorInc = 1;
 	this.tentColorBW = false;
 
-	//this.spikeScale = new THREE.Vector3(0.15, 1.2, 0.15);
 	this.spikeScale = new THREE.Vector3(0.15, 1.4, 0.3);
 
 	this.sphereDetail = 20;
