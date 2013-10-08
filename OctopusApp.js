@@ -12,7 +12,7 @@ var animating = true;
 
 var resMgr = null;
 
-var sPressed = false;
+var keyPressed = [];
 
 //***************************************************************************//
 // initialize the renderer, scene, camera, and lights                        //
@@ -42,7 +42,7 @@ function onLoad()
     // Create an ambient and a directional light to show off the object
     var ambLight = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
     var dirLight = new THREE.DirectionalLight( 0xffffff, 1);
-    dirLight.position.set(0, 0, 1);
+    dirLight.position.set(0, 1, 1);
     scene.add( ambLight );
     scene.add( dirLight );
 
@@ -126,11 +126,18 @@ function onKeyDown(evt)
     if (keyCode == 32) {
         animating = !animating;        
     }
-    else if (keyCode == 83)
+    else if (keyCode == 83) // 's'
     {
-        if (!sPressed) {
-            sPressed = true;
+        if (!keyPressed[keyCode]) {
+            keyPressed[keyCode] = true;
             octopus.setFeeling("scared", 0.1);
+        }
+    }
+    else if (keyCode == 66) // 'b'
+    {
+        if (!keyPressed[keyCode]) {
+            keyPressed[keyCode] = true;
+            octopus.shutEyes(0.2);
         }
     }
 }
@@ -140,9 +147,15 @@ function onKeyUp(evt)
     var keyCode = getKeyCode(evt);
 
     if (keyCode == 83) {
-        if (sPressed) {
+        if (keyPressed[keyCode]) {
             octopus.setFeeling("normal", 0.2);
-            sPressed = false;
+            keyPressed[keyCode] = false;
+        }
+    }
+    else if (keyCode == 66) {
+        if (keyPressed[keyCode]) {
+            octopus.openEyes(0.3);
+            keyPressed[keyCode] = false;
         }
     }
 }
