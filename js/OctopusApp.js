@@ -73,7 +73,6 @@ function populateScene()
 
     octopus = new Octopus(genome);
     octopus.build();
-//    octopus.position = new THREE.Vector3(100, 100, 100);
     octopus.rotation.y = Math.PI/20;
     scene.add(octopus);
 
@@ -154,9 +153,6 @@ function onKeyDown(evt)
             exporter = new THREE.STLExporter();
             exporter.exportScene(scene);
             exporter.sendToServer();
-            console.log(exporter.stlBinContent);
-//            stlContent = exporter.stlContent;
-//            console.log(exporter.exportScene(scene));
         }
     }
 }

@@ -87,30 +87,27 @@ THREE.STLExporter.prototype = {
 	},
 
 	addTriangleToBinContent: function(normal, vertex1, vertex2, vertex3) {
-//		console.log(this.currentBinHead);
-//		console.log(this.stlBinContent.byteLength);
-
-		var faceData = new Uint8Array(50);
+		var faceData = new ArrayBuffer(50);
 
 		var bNormal = new Float32Array(faceData, 0, 3);
 		bNormal[0] = normal.x;
 		bNormal[1] = normal.y;
 		bNormal[2] = normal.z;
 
-		var bV = new Float32Array(faceData, 12, 3);
-		bV[0] = vertex1.x;
-		bV[1] = vertex1.y;
-		bV[2] = vertex1.z;
+		var bV1 = new Float32Array(faceData, 12, 3);
+		bV1[0] = vertex1.x;
+		bV1[1] = vertex1.y;
+		bV1[2] = vertex1.z;
 
-		bV = new Float32Array(faceData, 24, 3);
-		bV[0] = vertex2.x;
-		bV[1] = vertex2.y;
-		bV[2] = vertex2.z;
+		var bV2 = new Float32Array(faceData, 24, 3);
+		bV2[0] = vertex2.x;
+		bV2[1] = vertex2.y;
+		bV2[2] = vertex2.z;
 
-		bV = new Float32Array(faceData, 36, 3);
-		bV[0] = vertex3.x;
-		bV[1] = vertex3.y;
-		bV[2] = vertex3.z;
+		var bV3 = new Float32Array(faceData, 36, 3);
+		bV3[0] = vertex3.x;
+		bV3[1] = vertex3.y;
+		bV3[2] = vertex3.z;
 
 		memcpy(this.stlBinContent, this.currentBinHead, faceData, 0, 50);
 		this.currentBinHead += 50;
@@ -122,9 +119,6 @@ THREE.STLExporter.prototype = {
 		if (matrix !== undefined) {
 			result.applyMatrix4 (matrix);
 		}
-//		if (position !== undefined) {
-//			result.add (position);
-//		}
 		return result;
 	},
 
@@ -132,18 +126,21 @@ THREE.STLExporter.prototype = {
 	setBinHeader : function() {
 		var header = new Uint8Array(this.stlBinContent, 0, 80);
 		var size = new Uint32Array(this.stlBinContent, 80, 1);
-		header[0] = 'g';
-		header[1] = 'a';
-		header[2] = 'l';
+		header[0] = 65;
+		header[1] = 66;
+		header[2] = 67;
 		header[3] = 0;
 		size[0] = this.triNum;
 		this.currentBinHead = 84;
 	},
 
 	sendToServer : function() {
-		console.log(this.stlBinContent);
-		$.post("save.php", { data: this.stlContent });
+		console.log("sending data [size = "+this.stlBinContent.byteLength+" bytes]");
+		var dataView = new Uint8Array(this.stlBinContent, 0);
 
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "/php/save.php", false);
+		xhr.send(dataView);
 	}
 
 };
