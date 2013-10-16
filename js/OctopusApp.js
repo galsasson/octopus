@@ -14,6 +14,8 @@ var resMgr = null;
 
 var keyPressed = [];
 
+var exporter = null;
+
 //***************************************************************************//
 // initialize the renderer, scene, camera, and lights                        //
 //***************************************************************************//
@@ -71,6 +73,7 @@ function populateScene()
 
     octopus = new Octopus(genome);
     octopus.build();
+//    octopus.position = new THREE.Vector3(100, 100, 100);
     octopus.rotation.y = Math.PI/20;
     scene.add(octopus);
 
@@ -123,6 +126,8 @@ function onKeyDown(evt)
 {
     var keyCode = getKeyCode(evt);
 
+    //console.log(keyCode);
+
     if (keyCode == 32) {
         animating = !animating;        
     }
@@ -140,23 +145,35 @@ function onKeyDown(evt)
             octopus.shutEyes(0.2);
         }
     }
+    else if (keyCode == 69) // 'e'
+    {
+        if (!keyPressed[keyCode]) {
+            keyPressed[keyCode] = true;
+            // export to STL
+            octopus.updateMatrixWorld(true);
+            exporter = new THREE.STLExporter();
+            exporter.exportScene(scene);
+            exporter.sendToServer();
+            console.log(exporter.stlBinContent);
+//            stlContent = exporter.stlContent;
+//            console.log(exporter.exportScene(scene));
+        }
+    }
 }
 
 function onKeyUp(evt)
 {
     var keyCode = getKeyCode(evt);
 
+    keyPressed[keyCode] = false;
+
     if (keyCode == 83) {
-        if (keyPressed[keyCode]) {
-            octopus.setFeeling("normal", 0.2);
-            keyPressed[keyCode] = false;
-        }
+        octopus.setFeeling("normal", 0.2);
+        keyPressed[keyCode] = false;
     }
     else if (keyCode == 66) {
-        if (keyPressed[keyCode]) {
-            octopus.openEyes(0.3);
-            keyPressed[keyCode] = false;
-        }
+        octopus.openEyes(0.3);
+        keyPressed[keyCode] = false;
     }
 }
 
