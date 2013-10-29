@@ -11,12 +11,18 @@ function Genome()
 	this.numTents = 8;
 	this.numJoints = 20;
 	this.jointScaleVector = new THREE.Vector3(0.92, 0.92, 0.92);
-	this.numSpikesPerJoint = 0;
+	this.numSpikesPerJoint = 5;
 	this.spikesArcStart = 0;
 	this.spikesArcEnd = Math.PI*2;
 	this.tentColorInc = 1;
 	this.tentColorBW = false;
 	this.spikeScale = new THREE.Vector3(0.15, 1.5, 0.3);
+
+	// tentacle movement
+	this.tentFactor1 = 50.0;
+	this.tentFactor2 = 10.0;
+	this.tentFactor3 = 10.0;
+	this.tentFactor4 = 10.0;
 
 	// eye
 	this.eyeRadius = 2.5;

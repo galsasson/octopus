@@ -5,6 +5,7 @@ var controls = null;
 var camera = null;
 
 var octopus = null;
+var genome = null;
 
 var clock = null;
 
@@ -54,6 +55,9 @@ function onLoad()
     addInputHandler();
     window.addEventListener( 'resize', onWindowResize, false );
 
+    // add gui
+    addGui();
+
     clock = new THREE.Clock();
 
     // Run our render loop
@@ -65,7 +69,7 @@ function onLoad()
 //***************************************************************************//
 function populateScene()
 {
-    var genome = new Genome();
+    genome = new Genome();
     resMgr = new ResourceManager(genome);
 
     // load resources
@@ -84,6 +88,14 @@ function populateScene()
 
 }
 
+function addGui()
+{
+    var gui = new dat.GUI();
+    gui.add(genome, 'tentFactor1', 0, 100);
+    gui.add(genome, 'tentFactor2', 0, 50);
+    gui.add(genome, 'tentFactor3', 0, 50);
+    gui.add(genome, 'tentFactor4', 0, 50);
+}
 //***************************************************************************//
 // render loop                                                               //
 //***************************************************************************//

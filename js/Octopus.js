@@ -402,7 +402,9 @@ OctopusTentacle.prototype.setFeeling = function(feeling, delay)
 
 OctopusTentacle.prototype.getJointRotation = function(time, jIndex)
 {
-	return Math.sin(time+(jIndex*(Math.PI/50)))*(Math.PI/10) + Math.sin(jIndex/10)*-Math.PI/10;
+	var genome = this.genome;
+	return Math.sin(time+(jIndex*(Math.PI/genome.tentFactor1)))*(Math.PI/genome.tentFactor2) 
+		+ Math.sin(jIndex/genome.tentFactor3)*-Math.PI/genome.tentFactor4;
 }
 
 OctopusTentacle.prototype.getHairRotation = function(time, index)
