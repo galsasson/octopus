@@ -121,7 +121,7 @@ OctopusHead.prototype.build = function()
 		}
 
 		// add eyes to the third sphere
-		if (i>1 && i<6)
+		if (i>0 && i<6)
 		{
 			// add eyes
 			for (var e=0; e<2; e++)

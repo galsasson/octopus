@@ -109,6 +109,10 @@ THREE.STLExporter.prototype = {
 		bV3[1] = vertex3.y;
 		bV3[2] = vertex3.z;
 
+		var color = new Uint8Array(faceData, 48, 2);
+		color[0] = 0x00;
+		color[1] = 0xff;
+
 		memcpy(this.stlBinContent, this.currentBinHead, faceData, 0, 50);
 		this.currentBinHead += 50;
 	},
