@@ -49,6 +49,20 @@ Octopus.prototype.build = function()
 	}
 }
 
+Octopus.prototype.initWithGenome = function(genome)
+{
+	this.genome = genome;
+
+	// remove all objects
+	this.remove(this.head);
+	for (var i=0; i<this.tentPosers.length; i++)
+	{
+		this.remove(this.tentPosers[i]);
+	}
+
+	this.build();
+}
+
 Octopus.prototype.setFeeling = function(feeling, delay)
 {
 	for (var i=0; i<this.tents.length; i++)

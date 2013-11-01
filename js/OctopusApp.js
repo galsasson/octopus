@@ -43,11 +43,16 @@ function onLoad()
     controls.addEventListener( 'change', render );
 
     // Create an ambient and a directional light to show off the object
+    var dirLight = [];
     var ambLight = new THREE.AmbientLight( 0xaaaaaa ); // soft white light
-    var dirLight = new THREE.DirectionalLight( 0xffffff, 1);
-    dirLight.position.set(0, 1, 1);
+    dirLight[0] = new THREE.DirectionalLight( 0xffffff, 1);
+    dirLight[0].position.set(0, 1, 1);
+    dirLight[1] = new THREE.DirectionalLight( 0xbbbbbb, 1);
+    dirLight[1].position.set(0, -1, -1);
+
     scene.add( ambLight );
-    scene.add( dirLight );
+    scene.add( dirLight[0] );
+    scene.add( dirLight[1] );
 
     populateScene();
 
@@ -91,11 +96,55 @@ function populateScene()
 function addGui()
 {
     var gui = new dat.GUI();
-    gui.add(genome, 'tentFactor1', 0, 100);
-    gui.add(genome, 'tentFactor2', 0, 50);
-    gui.add(genome, 'tentFactor3', 0, 50);
-    gui.add(genome, 'tentFactor4', 0, 50);
+    var f1 = gui.addFolder('HEAD GEOMETRY');
+    f1.add(genome, 'headBaseRadius', 5, 35).onChange(onGeometryChanged);
+    var tmpF = f1.addFolder('Head Scale Vector');
+    tmpF.add(genome.headJointsScaleFactor, 'x', 0.7, 1.2).onChange(onGeometryChanged);
+    tmpF.add(genome.headJointsScaleFactor, 'y', 0.7, 1.2).onChange(onGeometryChanged);
+    tmpF.add(genome.headJointsScaleFactor, 'z', 0.7, 1.2).onChange(onGeometryChanged);
+    var f4 = f1.addFolder('EYE GEOMETRY');
+    f4.add(genome, 'eyeRadius', 0, 10).onChange(onGeometryChanged);
+    f4.add(genome, 'eyeLidRadius', 0, 13).onChange(onGeometryChanged);
+    f4.add(genome, 'topLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);
+    f4.add(genome, 'bottomLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);
+
+    var f2 = gui.addFolder('TENTACLE GEOMETRY');
+    f2.add(genome, 'tentBaseRadius', 0, 20).onChange(onGeometryChanged);
+    f2.add(genome, 'numTents', 0, 32).onChange(onGeometryChanged);
+    f2.add(genome, 'numJoints', 0, 50).onChange(onGeometryChanged);
+
+    tmpF = f2.addFolder('Joint Scale Vector');
+    tmpF.add(genome.jointScaleVector, 'x', 0.7, 1.3).onChange(onGeometryChanged);
+    tmpF.add(genome.jointScaleVector, 'y', 0.7, 1.3).onChange(onGeometryChanged);
+    tmpF.add(genome.jointScaleVector, 'z', 0.7, 1.3).onChange(onGeometryChanged);
+    f2.add(genome, 'numSpikesPerJoint', 0, 10).onChange(onGeometryChanged);
+    f2.add(genome, 'spikesArcStart', 0.0, 2*Math.PI).onChange(onGeometryChanged);
+    f2.add(genome, 'spikesArcEnd', 0.0, 2*Math.PI).onChange(onGeometryChanged);
+    tmpF = f2.addFolder("Spike Scale Vector");
+    tmpF.add(genome.spikeScale, 'x', 0.7, 1.3).onChange(onGeometryChanged);
+    tmpF.add(genome.spikeScale, 'y', 0.7, 1.3).onChange(onGeometryChanged);
+    tmpF.add(genome.spikeScale, 'z', 0.7, 1.3).onChange(onGeometryChanged);
+    f2.add(genome, 'tentColorInc', 0, 10).onChange(onGeometryChanged);
+    f2.add(genome, 'tentColorBW').onChange(onGeometryChanged);
+
+    var f3 = gui.addFolder('ANIMATION');
+    f3.add(genome, 'tentFactor1', 0, 100);
+    f3.add(genome, 'tentFactor2', 0, 50);
+    f3.add(genome, 'tentFactor3', 0, 50);
+    f3.add(genome, 'tentFactor4', 0, 50);
+
+    var f5 = gui.addFolder('GEOMETRY DETAILS');
+    f5.add(genome, 'sphereDetail', 0, 40).onChange(onGeometryChanged);
+    f5.add(genome, 'cylinderDetail', 0, 40).onChange(onGeometryChanged);
+    f5.add(genome, 'eyeDetails', 0, 20).onChange(onGeometryChanged);
+
 }
+
+function onGeometryChanged()
+{
+        octopus.initWithGenome(genome);    
+}
+
 //***************************************************************************//
 // render loop                                                               //
 //***************************************************************************//
