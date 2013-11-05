@@ -142,7 +142,7 @@ function addGui()
 
 function onGeometryChanged()
 {
-        octopus.initWithGenome(genome);    
+    octopus.initWithGenome(genome);    
 }
 
 //***************************************************************************//

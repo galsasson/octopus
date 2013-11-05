@@ -1,0 +1,485 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Geo",
+				"THREE.CubeGeometry"
+			],
+			[
+				"Ve",
+				"THREE.Vector3"
+			],
+			[
+				"head",
+				"headJointsScaleFactor"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"current",
+				"currentBinHead"
+			],
+			[
+				"curre",
+				"currentBinHead"
+			],
+			[
+				"ti",
+				"tiangleCount"
+			],
+			[
+				"stl",
+				"stlBinContent"
+			],
+			[
+				"topLid",
+				"topLidAngle"
+			],
+			[
+				"tar",
+				"targetZRotation"
+			],
+			[
+				"rot",
+				"rotation"
+			],
+			[
+				"prot",
+				"prototype"
+			],
+			[
+				"bottomLid",
+				"bottomLidMesh"
+			],
+			[
+				"bottom",
+				"bottomLid"
+			],
+			[
+				"topLi",
+				"topLidMesh"
+			],
+			[
+				"inne",
+				"innerHeight"
+			],
+			[
+				"onMou",
+				"onMouseMove"
+			],
+			[
+				"pre",
+				"preventDefault"
+			],
+			[
+				"templ",
+				"templateAndVerify"
+			],
+			[
+				"paint",
+				"paintingToString"
+			],
+			[
+				"con",
+				"controls"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 945,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "var renderer = null;\nvar scene = null;\n\nvar controls = null;\nvar camera = null;\n\nvar octopus = null;\nvar genome = null;\n\nvar clock = null;\n\nvar animating = true;\n\nvar resMgr = null;\n\nvar keyPressed = [];\n\nvar exporter = null;\n\n//***************************************************************************//\n// initialize the renderer, scene, camera, and lights                        //\n//***************************************************************************//\nfunction onLoad()\n{\n    // Grab our container div\n    var container = document.getElementById(\"container\");\n\n    // Create the Three.js renderer, add it to our div\n    renderer = new THREE.WebGLRenderer( { antialias: true } );\n    renderer.setSize(window.innerWidth, window.innerHeight);\n    renderer.setClearColor(0);\n    container.appendChild( renderer.domElement );\n\n    // Create a new Three.js scene\n    scene = new THREE.Scene();\n\n    // Put in a camera\n    camera = new THREE.PerspectiveCamera( 60, \n        window.innerWidth / window.innerHeight, 1, 4000 );\n        \n    camera.position.set( 0, 0, 180);\n    controls = new THREE.OrbitControls(camera);\n    controls.addEventListener( 'change', render );\n\n    // Create an ambient and a directional light to show off the object\n    var dirLight = [];\n    var ambLight = new THREE.AmbientLight( 0xaaaaaa ); // soft white light\n    dirLight[0] = new THREE.DirectionalLight( 0xffffff, 1);\n    dirLight[0].position.set(0, 1, 1);\n    dirLight[1] = new THREE.DirectionalLight( 0xbbbbbb, 1);\n    dirLight[1].position.set(0, -1, -1);\n\n    scene.add( ambLight );\n    scene.add( dirLight[0] );\n    scene.add( dirLight[1] );\n\n    populateScene();\n\n    // Add a mouse up handler to toggle the animation\n    addInputHandler();\n    window.addEventListener( 'resize', onWindowResize, false );\n\n    // add gui\n    addGui();\n\n    clock = new THREE.Clock();\n\n    // Run our render loop\n	run();\n}\n\n//***************************************************************************//\n// Populate the scene object with our objects                                //\n//***************************************************************************//\nfunction populateScene()\n{\n    genome = new Genome();\n    resMgr = new ResourceManager(genome);\n\n    // load resources\n    resMgr.initMaterials();\n\n    octopus = new Octopus(genome);\n    octopus.build();\n    octopus.rotation.y = Math.PI/20;\n    scene.add(octopus);\n\n    planeGeo = new THREE.PlaneGeometry(5000, 5000, 2, 2);\n    planeMesh = new THREE.Mesh(planeGeo, resMgr.materials.basic);\n    planeMesh.rotation.x = -Math.PI/2;\n    planeMesh.position.y = -100;\n//    scene.add(planeMesh);\n\n}\n\nfunction addGui()\n{\n    var gui = new dat.GUI();\n    var f1 = gui.addFolder('HEAD GEOMETRY');\n    f1.add(genome, 'headBaseRadius', 5, 35).onChange(onGeometryChanged);\n    var tmpF = f1.addFolder('Head Scale Vector');\n    tmpF.add(genome.headJointsScaleFactor, 'x', 0.7, 1.2).onChange(onGeometryChanged);\n    tmpF.add(genome.headJointsScaleFactor, 'y', 0.7, 1.2).onChange(onGeometryChanged);\n    tmpF.add(genome.headJointsScaleFactor, 'z', 0.7, 1.2).onChange(onGeometryChanged);\n    var f4 = f1.addFolder('EYE GEOMETRY');\n    f4.add(genome, 'eyeRadius', 0, 10).onChange(onGeometryChanged);\n    f4.add(genome, 'eyeLidRadius', 0, 13).onChange(onGeometryChanged);\n    f4.add(genome, 'topLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);\n    f4.add(genome, 'bottomLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);\n\n    var f2 = gui.addFolder('TENTACLE GEOMETRY');\n    f2.add(genome, 'tentBaseRadius', 0, 20).onChange(onGeometryChanged);\n    f2.add(genome, 'numTents', 0, 32).onChange(onGeometryChanged);\n    f2.add(genome, 'numJoints', 0, 50).onChange(onGeometryChanged);\n\n    tmpF = f2.addFolder('Joint Scale Vector');\n    tmpF.add(genome.jointScaleVector, 'x', 0.7, 1.3).onChange(onGeometryChanged);\n    tmpF.add(genome.jointScaleVector, 'y', 0.7, 1.3).onChange(onGeometryChanged);\n    tmpF.add(genome.jointScaleVector, 'z', 0.7, 1.3).onChange(onGeometryChanged);\n    f2.add(genome, 'numSpikesPerJoint', 0, 10).onChange(onGeometryChanged);\n    f2.add(genome, 'spikesArcStart', 0.0, 2*Math.PI).onChange(onGeometryChanged);\n    f2.add(genome, 'spikesArcEnd', 0.0, 2*Math.PI).onChange(onGeometryChanged);\n    tmpF = f2.addFolder(\"Spike Scale Vector\");\n    tmpF.add(genome.spikeScale, 'x', 0.7, 1.3).onChange(onGeometryChanged);\n    tmpF.add(genome.spikeScale, 'y', 0.7, 1.3).onChange(onGeometryChanged);\n    tmpF.add(genome.spikeScale, 'z', 0.7, 1.3).onChange(onGeometryChanged);\n    f2.add(genome, 'tentColorInc', 0, 10).onChange(onGeometryChanged);\n    f2.add(genome, 'tentColorBW').onChange(onGeometryChanged);\n\n    var f3 = gui.addFolder('ANIMATION');\n    f3.add(genome, 'tentFactor1', 0, 100);\n    f3.add(genome, 'tentFactor2', 0, 50);\n    f3.add(genome, 'tentFactor3', 0, 50);\n    f3.add(genome, 'tentFactor4', 0, 50);\n\n    var f5 = gui.addFolder('GEOMETRY DETAILS');\n    f5.add(genome, 'sphereDetail', 0, 40).onChange(onGeometryChanged);\n    f5.add(genome, 'cylinderDetail', 0, 40).onChange(onGeometryChanged);\n    f5.add(genome, 'eyeDetails', 0, 20).onChange(onGeometryChanged);\n\n}\n\nfunction onGeometryChanged()\n{\n    var a = THREE.Animation( root, data, interpolationType, JITCompile );\n    a\n    octopus.initWithGenome(genome);    \n}\n\n//***************************************************************************//\n// render loop                                                               //\n//***************************************************************************//\nfunction run()\n{\n    var deltaMS = clock.getDelta()*1000;\n\n    render();\n\n    if (animating)\n    {\n        octopus.animate(deltaMS);\n    }\n\n    // Ask for another frame\n    requestAnimationFrame(run);\n    controls.update();\n}\n\n// Render the scene\nfunction render()\n{\n    renderer.render(scene, camera);    \n}\n\n//***************************************************************************//\n// User interaction                                                          //\n//***************************************************************************//\nfunction addInputHandler()\n{\n    var dom = renderer.domElement;\n    dom.addEventListener('mouseup', onMouseUp, false);\n    dom.addEventListener('mousedown', onMouseDown, false);\n    window.addEventListener('keydown', onKeyDown, false);\n    window.addEventListener('keyup', onKeyUp, false);\n}\n\nfunction onKeyDown(evt)\n{\n    var keyCode = getKeyCode(evt);\n\n    //console.log(keyCode);\n\n    if (keyCode == 32) {\n        animating = !animating;        \n    }\n    else if (keyCode == 83) // 's'\n    {\n        if (!keyPressed[keyCode]) {\n            keyPressed[keyCode] = true;\n            octopus.setFeeling(\"scared\", 0.1);\n        }\n    }\n    else if (keyCode == 66) // 'b'\n    {\n        if (!keyPressed[keyCode]) {\n            keyPressed[keyCode] = true;\n            octopus.shutEyes(0.2);\n        }\n    }\n    else if (keyCode == 69) // 'e'\n    {\n        if (!keyPressed[keyCode]) {\n            keyPressed[keyCode] = true;\n            // export to STL\n            octopus.updateMatrixWorld(true);\n            exporter = new THREE.STLExporter();\n            exporter.exportScene(scene);\n            exporter.sendToServer();\n        }\n    }\n}\n\nfunction onKeyUp(evt)\n{\n    var keyCode = getKeyCode(evt);\n\n    keyPressed[keyCode] = false;\n\n    if (keyCode == 83) {\n        octopus.setFeeling(\"normal\", 0.2);\n        keyPressed[keyCode] = false;\n    }\n    else if (keyCode == 66) {\n        octopus.openEyes(0.3);\n        keyPressed[keyCode] = false;\n    }\n}\n\nfunction onMouseDown(event)\n{\n    event.preventDefault();\n}\n\nfunction onMouseUp(event)\n{\n    event.preventDefault();\n}\n\nfunction onMouseMove(event)\n{\n    event.preventDefault();\n    if (dragging) {\n        var x = prevMouse.x - event.x;\n        var y = prevMouse.y - event.y;\n        camera.rotation.y -= x/1000;\n\n        prevMouse.x = event.x;\n        prevMouse.y = event.y;\n    }\n}\n\nfunction onWindowResize() \n{\n    camera.aspect = window.innerWidth / window.innerHeight;\n    camera.updateProjectionMatrix();\n\n    renderer.setSize(window.innerWidth, window.innerHeight);\n}\n\nfunction getKeyCode(evt)\n{\n    if (window.event != null) \n        return window.event.keyCode;\n    else\n        return evt.which;\n}\n\nfunction map(i, sStart, sEnd, tStart, tEnd)\n{\n    var v = i-sStart;\n    if (v>=0) {\n        if (i < sStart) {\n            return tStart;\n        } else if (i > sEnd) {\n            return tEnd;\n        }\n    } else {\n        if (i > sStart) {\n            return tStart;\n        } else if (i < sEnd){\n            return tEnd;\n        }\n    }\n    var sRange = sEnd - sStart;\n    if (sRange == 0) {\n        return tStart;\n    }\n\n    var tMax = tEnd - tStart;\n    return tStart + v / sRange * tMax;\n}\n",
+			"file": "js/OctopusApp.js",
+			"file_size": 8649,
+			"file_write_time": 130280105880000000,
+			"settings":
+			{
+				"buffer_size": 8729,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/Genome.js",
+			"settings":
+			{
+				"buffer_size": 1058,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/Octopus.js",
+			"settings":
+			{
+				"buffer_size": 11986,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n\n",
+			"settings":
+			{
+				"buffer_size": 2,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 47.0,
+		"selected_items":
+		[
+			[
+				"packa",
+				"Preferences: Browse Packages"
+			],
+			[
+				"pac",
+				"Preferences: Browse Packages"
+			],
+			[
+				"synt",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"cli",
+				"Set Syntax: Batch File"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/gal/itp/projects/octopus/js/libs/dat.gui.js",
+		"/Users/gal/itp/semester3/newtech/browser_extension/blindfold.css",
+		"/manifest.json",
+		"/Users/gal/itp/projects/octopus/index.html",
+		"/Users/gal/itp/projects/octopus/js/OctopusApp.js",
+		"/Users/gal/itp/projects/octopus/js/libs/STLExporter.js",
+		"/Users/gal/itp/projects/octopus/php/save.php",
+		"/Users/gal/itp/projects/octopus/js/Genome.js",
+		"/Users/gal/itp/projects/octopus/js/Octopus.js",
+		"/Users/gal/itp/semester3/newtech/browser_extension/manifest.json",
+		"/Users/gal/itp/projects/octopus/exports/octopus2.stl",
+		"/Users/gal/itp/projects/octopus/libs/OBJExporter.js",
+		"/Users/gal/itp/projects/octopus/exports/octopus1",
+		"/private/tmp/badpage.txt",
+		"/Users/gal/itp/projects/phone-drawing/files/hit/paint.properties",
+		"/Users/gal/itp/projects/phone-drawing/files/hit/paint.question.xml",
+		"/Users/gal/itp/projects/phone-drawing/files/dbconfig.php",
+		"/Users/gal/itp/projects/phone-drawing/files/test.php",
+		"/Users/gal/Documents/Processing/image_copy/web-export/index.html",
+		"/Users/gal/itp/projects/phone-drawing/files/insert.php",
+		"/Users/gal/itp/projects/phone-drawing/deploy.sh",
+		"/Users/gal/itp/semester3/inter3D/three.js/examples/js/controls/OrbitControls.js",
+		"/Users/gal/itp/projects/octopus/Genome.js",
+		"/Users/gal/itp/projects/octopus/Octopus.js",
+		"/Users/gal/itp/projects/octopus/OctopusApp.js",
+		"/Users/gal/itp/projects/turbine/nature/js/libs/rig.js",
+		"/Users/gal/itp/projects/turbine/nature/js/20-turbine.js"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"controllerFactory",
+			"apply",
+			"apply(",
+			"apply(gui, factoryArgs)",
+			"controllerFactory.apply",
+			"recallSavedValue",
+			"add(",
+			"console.log",
+			"triCnt",
+			"joints",
+			"hairs",
+			"controls",
+			"paint",
+			"verify",
+			"serverToken",
+			"xmlToPainting",
+			"render",
+			"this.mes",
+			"new THREE.Mesh",
+			"stringer",
+			"geo",
+			"cylinder",
+			"camera"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 945,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								522,
+								522
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "js/OctopusApp.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8729,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5261,
+								5261
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1660.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/Genome.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1058,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								696,
+								706
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/Octopus.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11986,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1190,
+								1190
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 412.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2,
+								2
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"project": "octopus.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
