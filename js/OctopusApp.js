@@ -4,8 +4,9 @@ var scene = null;
 var controls = null;
 var camera = null;
 
-var octopus = null;
 var genome = null;
+var octopus = null;
+var experiment = null;
 
 var clock = null;
 
@@ -16,6 +17,9 @@ var resMgr = null;
 var keyPressed = [];
 
 var exporter = null;
+
+var testArrSize = 100;
+var testArr = [];
 
 //***************************************************************************//
 // initialize the renderer, scene, camera, and lights                        //
@@ -35,10 +39,10 @@ function onLoad()
     scene = new THREE.Scene();
 
     // Put in a camera
-    camera = new THREE.PerspectiveCamera( 60, 
-        window.innerWidth / window.innerHeight, 1, 4000 );
+    camera = new THREE.PerspectiveCamera( 40, 
+        window.innerWidth / window.innerHeight, 1, 10000 );
         
-    camera.position.set( 0, 0, 180);
+    camera.position.set( 0, 0, 400);
     controls = new THREE.OrbitControls(camera);
     controls.addEventListener( 'change', render );
 
@@ -54,7 +58,8 @@ function onLoad()
     scene.add( dirLight[0] );
     scene.add( dirLight[1] );
 
-    populateScene();
+    // populateScene();
+    populateExperimentScene();
 
     // Add a mouse up handler to toggle the animation
     addInputHandler();
@@ -90,6 +95,29 @@ function populateScene()
     planeMesh.rotation.x = -Math.PI/2;
     planeMesh.position.y = -100;
 //    scene.add(planeMesh);
+
+}
+
+function populateExperimentScene()
+{
+    genome = new Genome();
+    resMgr = new ResourceManager(genome);
+
+    // load resources
+    resMgr.initMaterials();
+
+    /* Textured Objects ?? */
+    // experiment = new TexturedSphere();
+    // experiment.build();
+    // scene.add(experiment);
+
+    // Movement
+    for (var i=0; i<100; i++)
+    {
+        testArr[i] = new TestObject();
+        testArr[i].init(i);
+        scene.add(testArr[i]);
+    }
 
 }
 
@@ -156,12 +184,20 @@ function run()
 
     if (animating)
     {
-        octopus.animate(deltaMS);
+        if (octopus != null) {
+            octopus.animate(deltaMS);
+        }
     }
 
     // Ask for another frame
     requestAnimationFrame(run);
     controls.update();
+
+    for (var i=0; i<testArr.length; i++)
+    {
+        testArr[i].update();
+    }
+//    experiment.update();
 }
 
 // Render the scene
@@ -210,7 +246,7 @@ function onKeyDown(evt)
         if (!keyPressed[keyCode]) {
             keyPressed[keyCode] = true;
             // export to STL
-            octopus.updateMatrixWorld(true);
+            scene.updateMatrixWorld(true);
             exporter = new THREE.STLExporter();
             exporter.exportScene(scene);
             exporter.sendToServer();
