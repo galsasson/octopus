@@ -1,7 +1,7 @@
 /**
  * @author kovacsv / http://kovacsv.hu/
  */
- 
+
 THREE.STLExporter = function () {
 	this.stlContent = '';
 	this.triNum = 0;
@@ -11,14 +11,14 @@ THREE.STLExporter = function () {
 
 THREE.STLExporter.prototype = {
 	constructor: THREE.STLExporter,
-	
+
 	exportScene : function (scene) {
 		var meshes = [];
 
 		//this.triangleCount = 0;
 		this.currentBinHead = 0;
 		var cnt = 0;
-		
+
 		var current;
 		scene.traverse (function (current) {
 			if (current instanceof THREE.Mesh) {
@@ -28,30 +28,30 @@ THREE.STLExporter.prototype = {
 				}
 			}
 		});
-		
+
 
 		this.triNum = cnt;
 		this.stlBinContent = new ArrayBuffer(this.triNum*50+84);
 		return this.exportMeshes (meshes);
 	},
-	
+
 	exportMesh : function (mesh) {
 		return this.exportMeshes ([mesh]);
 	},
-	
+
 	exportMeshes : function (meshes) {
 		this.addLineToContent ('solid exported');
 		this.setBinHeader('solid exported');
-		
+
 		var i, j, mesh, geometry, face, matrix, position;
 		var normal, vertex1, vertex2, vertex3;
 		for (i = 0; i < meshes.length; i++) {
 			mesh = meshes[i];
-			
+
 			geometry = mesh.geometry;
 			matrix = mesh.matrixWorld;
 			position = mesh.position;
-			
+
 			for (j = 0; j < geometry.faces.length; j++) {
 				face = geometry.faces[j];
 				normal = face.normal;
@@ -62,20 +62,20 @@ THREE.STLExporter.prototype = {
 				this.addTriangleToBinContent(normal, vertex1, vertex2, vertex3);
 			}
 		};
-		
+
 		this.addLineToContent ('endsolid exported');
 		return this.stlContent;
 	},
-	
+
 	clearContent : function ()
 	{
 		this.stlContent = '';
 	},
-	
+
 	addLineToContent : function (line) {
 		this.stlContent += line + '\n';
 	},
-	
+
 	addTriangleToContent : function (normal, vertex1, vertex2, vertex3) {
 		this.addLineToContent ('\tfacet normal ' + normal.x + ' ' + normal.y + ' ' + normal.z);
 		this.addLineToContent ('\t\touter loop');
@@ -117,7 +117,7 @@ THREE.STLExporter.prototype = {
 		this.currentBinHead += 50;
 	},
 
-	
+
 	getTransformedPosition : function (vertex, matrix, position) {
 		var result = vertex.clone ();
 		if (matrix !== undefined) {
@@ -145,6 +145,15 @@ THREE.STLExporter.prototype = {
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", "/php/save.php", false);
 		xhr.send(dataView);
+	},
+
+	download : function() {
+		var dataView = new Uint8Array(this.stlBinContent, 0);
+		var blob = new Blob([dataView], {type: "application/octet-stream"});
+		var url = URL.createObjectURL(blob);
+		var a = document.querySelector("#STLExporter-download");
+		a.href = url;
+		a.download = "octopus.stl";
 	}
 
 };

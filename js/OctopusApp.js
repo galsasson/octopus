@@ -4,9 +4,6 @@ var scene = null;
 var controls = null;
 var camera = null;
 
-var octopus = null;
-var genome = null;
-
 var clock = null;
 
 var animating = true;
@@ -35,9 +32,9 @@ function onLoad()
     scene = new THREE.Scene();
 
     // Put in a camera
-    camera = new THREE.PerspectiveCamera( 60, 
+    camera = new THREE.PerspectiveCamera( 60,
         window.innerWidth / window.innerHeight, 1, 4000 );
-        
+
     camera.position.set( 0, 0, 180);
     controls = new THREE.OrbitControls(camera);
     controls.addEventListener( 'change', render );
@@ -74,75 +71,87 @@ function onLoad()
 //***************************************************************************//
 function populateScene()
 {
-    genome = new Genome();
-    resMgr = new ResourceManager(genome);
-
     // load resources
+    resMgr = new ResourceManager();
     resMgr.initMaterials();
 
-    octopus = new Octopus(genome);
-    octopus.build();
-    octopus.rotation.y = Math.PI/20;
-    scene.add(octopus);
+    var g = new Genome;
 
-    planeGeo = new THREE.PlaneGeometry(5000, 5000, 2, 2);
-    planeMesh = new THREE.Mesh(planeGeo, resMgr.materials.basic);
-    planeMesh.rotation.x = -Math.PI/2;
-    planeMesh.position.y = -100;
+    var joint = new JointPart();
+    joint.build();
+    scene.add(joint);
+
+    joint = new JointPart();
+    joint.build();
+    joint.position.y += g.rodLength + g.jointRadius;
+    scene.add(joint);
+
+
+    // octopus = new Octopus(genome);
+    // octopus.build();
+    // octopus.rotation.y = Math.PI/20;
+    // scene.add(octopus);
+
+    // planeGeo = new THREE.PlaneGeometry(5000, 5000, 2, 2);
+    // planeMesh = new THREE.Mesh(planeGeo, resMgr.materials.basic);
+    // planeMesh.rotation.x = -Math.PI/2;
+    // planeMesh.position.y = -100;
 //    scene.add(planeMesh);
+
+
 
 }
 
 function addGui()
 {
-    var gui = new dat.GUI();
-    var f1 = gui.addFolder('HEAD GEOMETRY');
-    f1.add(genome, 'headBaseRadius', 5, 35).onChange(onGeometryChanged);
-    var tmpF = f1.addFolder('Head Scale Vector');
-    tmpF.add(genome.headJointsScaleFactor, 'x', 0.7, 1.2).onChange(onGeometryChanged);
-    tmpF.add(genome.headJointsScaleFactor, 'y', 0.7, 1.2).onChange(onGeometryChanged);
-    tmpF.add(genome.headJointsScaleFactor, 'z', 0.7, 1.2).onChange(onGeometryChanged);
-    var f4 = f1.addFolder('EYE GEOMETRY');
-    f4.add(genome, 'eyeRadius', 0, 10).onChange(onGeometryChanged);
-    f4.add(genome, 'eyeLidRadius', 0, 13).onChange(onGeometryChanged);
-    f4.add(genome, 'topLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);
-    f4.add(genome, 'bottomLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);
+    // var gui = new dat.GUI();
+    // var f1 = gui.addFolder('HEAD GEOMETRY');
+    // f1.add(genome, 'headBaseRadius', 5, 35).onChange(onGeometryChanged);
+    // var tmpF = f1.addFolder('Head Scale Vector');
+    // tmpF.add(genome.headJointsScaleFactor, 'x', 0.7, 1.2).onChange(onGeometryChanged);
+    // tmpF.add(genome.headJointsScaleFactor, 'y', 0.7, 1.2).onChange(onGeometryChanged);
+    // tmpF.add(genome.headJointsScaleFactor, 'z', 0.7, 1.2).onChange(onGeometryChanged);
+    // var f4 = f1.addFolder('EYE GEOMETRY');
+    // f4.add(genome, 'eyeRadius', 0, 10).onChange(onGeometryChanged);
+    // f4.add(genome, 'eyeLidRadius', 0, 13).onChange(onGeometryChanged);
+    // f4.add(genome, 'topLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);
+    // f4.add(genome, 'bottomLidAngle', 0, 2*Math.PI).onChange(onGeometryChanged);
 
-    var f2 = gui.addFolder('TENTACLE GEOMETRY');
-    f2.add(genome, 'tentBaseRadius', 0, 20).onChange(onGeometryChanged);
-    f2.add(genome, 'numTents', 0, 32).onChange(onGeometryChanged);
-    f2.add(genome, 'numJoints', 0, 50).onChange(onGeometryChanged);
+    // var f2 = gui.addFolder('TENTACLE GEOMETRY');
+    // f2.add(genome, 'tentBaseRadius', 0, 20).onChange(onGeometryChanged);
+    // f2.add(genome, 'numTents', 0, 32).onChange(onGeometryChanged);
+    // f2.add(genome, 'numJoints', 0, 50).onChange(onGeometryChanged);
 
-    tmpF = f2.addFolder('Joint Scale Vector');
-    tmpF.add(genome.jointScaleVector, 'x', 0.7, 1.3).onChange(onGeometryChanged);
-    tmpF.add(genome.jointScaleVector, 'y', 0.7, 1.3).onChange(onGeometryChanged);
-    tmpF.add(genome.jointScaleVector, 'z', 0.7, 1.3).onChange(onGeometryChanged);
-    f2.add(genome, 'numSpikesPerJoint', 0, 10).onChange(onGeometryChanged);
-    f2.add(genome, 'spikesArcStart', 0.0, 2*Math.PI).onChange(onGeometryChanged);
-    f2.add(genome, 'spikesArcEnd', 0.0, 2*Math.PI).onChange(onGeometryChanged);
-    tmpF = f2.addFolder("Spike Scale Vector");
-    tmpF.add(genome.spikeScale, 'x', 0.7, 1.3).onChange(onGeometryChanged);
-    tmpF.add(genome.spikeScale, 'y', 0.7, 1.3).onChange(onGeometryChanged);
-    tmpF.add(genome.spikeScale, 'z', 0.7, 1.3).onChange(onGeometryChanged);
-    f2.add(genome, 'tentColorInc', 0, 10).onChange(onGeometryChanged);
-    f2.add(genome, 'tentColorBW').onChange(onGeometryChanged);
+    // tmpF = f2.addFolder('Joint Scale Vector');
+    // tmpF.add(genome.jointScaleVector, 'x', 0.7, 1.3).onChange(onGeometryChanged);
+    // tmpF.add(genome.jointScaleVector, 'y', 0.7, 1.3).onChange(onGeometryChanged);
+    // tmpF.add(genome.jointScaleVector, 'z', 0.7, 1.3).onChange(onGeometryChanged);
+    // f2.add(genome, 'numSpikesPerJoint', 0, 10).onChange(onGeometryChanged);
+    // f2.add(genome, 'spikesArcStart', 0.0, 2*Math.PI).onChange(onGeometryChanged);
+    // f2.add(genome, 'spikesArcEnd', 0.0, 2*Math.PI).onChange(onGeometryChanged);
+    // tmpF = f2.addFolder("Spike Scale Vector");
+    // tmpF.add(genome.spikeScale, 'x', 0.7, 1.3).onChange(onGeometryChanged);
+    // tmpF.add(genome.spikeScale, 'y', 0.7, 1.3).onChange(onGeometryChanged);
+    // tmpF.add(genome.spikeScale, 'z', 0.7, 1.3).onChange(onGeometryChanged);
+    // f2.add(genome, 'tentColorInc', 0, 10).onChange(onGeometryChanged);
+    // f2.add(genome, 'tentColorBW').onChange(onGeometryChanged);
 
-    var f3 = gui.addFolder('ANIMATION');
-    f3.add(genome, 'tentFactor1', 0, 100);
-    f3.add(genome, 'tentFactor2', 0, 50);
-    f3.add(genome, 'tentFactor3', 0, 50);
-    f3.add(genome, 'tentFactor4', 0, 50);
+    // var f3 = gui.addFolder('ANIMATION');
+    // f3.add(genome, 'tentFactor1', 0, 0.001);
+    // f3.add(genome, 'tentFactor2', 0, 50);
+    // f3.add(genome, 'tentFactor3', 0, 50);
+    // f3.add(genome, 'tentFactor4', 0, 50);
 
-    var f5 = gui.addFolder('GEOMETRY DETAILS');
-    f5.add(genome, 'sphereDetail', 0, 40).onChange(onGeometryChanged);
-    f5.add(genome, 'cylinderDetail', 0, 40).onChange(onGeometryChanged);
-    f5.add(genome, 'eyeDetails', 0, 20).onChange(onGeometryChanged);
+    // var f5 = gui.addFolder('GEOMETRY DETAILS');
+    // f5.add(genome, 'sphereDetail', 0, 40).onChange(onGeometryChanged);
+    // f5.add(genome, 'cylinderDetail', 0, 40).onChange(onGeometryChanged);
+    // f5.add(genome, 'eyeDetails', 0, 20).onChange(onGeometryChanged);
 
 }
 
 function onGeometryChanged()
 {
-    octopus.initWithGenome(genome);    
+    // octopus.initWithGenome(genome);
 }
 
 //***************************************************************************//
@@ -156,7 +165,7 @@ function run()
 
     if (animating)
     {
-        octopus.animate(deltaMS);
+        // octopus.animate(deltaMS);
     }
 
     // Ask for another frame
@@ -167,7 +176,7 @@ function run()
 // Render the scene
 function render()
 {
-    renderer.render(scene, camera);    
+    renderer.render(scene, camera);
 }
 
 //***************************************************************************//
@@ -189,32 +198,7 @@ function onKeyDown(evt)
     //console.log(keyCode);
 
     if (keyCode == 32) {
-        animating = !animating;        
-    }
-    else if (keyCode == 83) // 's'
-    {
-        if (!keyPressed[keyCode]) {
-            keyPressed[keyCode] = true;
-            octopus.setFeeling("scared", 0.1);
-        }
-    }
-    else if (keyCode == 66) // 'b'
-    {
-        if (!keyPressed[keyCode]) {
-            keyPressed[keyCode] = true;
-            octopus.shutEyes(0.2);
-        }
-    }
-    else if (keyCode == 69) // 'e'
-    {
-        if (!keyPressed[keyCode]) {
-            keyPressed[keyCode] = true;
-            // export to STL
-            octopus.updateMatrixWorld(true);
-            exporter = new THREE.STLExporter();
-            exporter.exportScene(scene);
-            exporter.sendToServer();
-        }
+        animating = !animating;
     }
 }
 
@@ -223,15 +207,6 @@ function onKeyUp(evt)
     var keyCode = getKeyCode(evt);
 
     keyPressed[keyCode] = false;
-
-    if (keyCode == 83) {
-        octopus.setFeeling("normal", 0.2);
-        keyPressed[keyCode] = false;
-    }
-    else if (keyCode == 66) {
-        octopus.openEyes(0.3);
-        keyPressed[keyCode] = false;
-    }
 }
 
 function onMouseDown(event)
@@ -257,7 +232,7 @@ function onMouseMove(event)
     }
 }
 
-function onWindowResize() 
+function onWindowResize()
 {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -267,7 +242,7 @@ function onWindowResize()
 
 function getKeyCode(evt)
 {
-    if (window.event != null) 
+    if (window.event != null)
         return window.event.keyCode;
     else
         return evt.which;
@@ -296,4 +271,13 @@ function map(i, sStart, sEnd, tStart, tEnd)
 
     var tMax = tEnd - tStart;
     return tStart + v / sRange * tMax;
+}
+
+function exportToSTL()
+{
+        // export to STL
+    octopus.updateMatrixWorld(true);
+    exporter = new THREE.STLExporter();
+    exporter.exportScene(scene);
+    exporter.download();
 }
